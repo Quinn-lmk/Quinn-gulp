@@ -28,9 +28,6 @@ gulp.task('sass', function(cb) {
         .pipe(sass().on('error', sass.logError))
         // .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
         .pipe(gulp.dest('./test/css'))
-        //css 格式检查
-        // .pipe(csslint())
-        // .pipe(csslint.formatter());
         cb()
 });
 
@@ -57,13 +54,17 @@ gulp.task('default',['webserver','openbrowser'],function(){
     gulp.watch(['./test/js/*.js'],['lint'])
     gulp.watch(['./test/*.html'],function(){
         gulp.run('openbrowser',function(){
-            console.log('=======success==master=====')
+            console.log('=======success=======')
         }); 
     });
 });
 
-
-
+//css检查
+gulp.task('css', function() {
+  gulp.src('client/css/*.css')
+    .pipe(csslint())
+    .pipe(csslint.formatter());
+});
 
 //将bootstrap中用到的css提取出来
 gulp.task('uncss', function () {
