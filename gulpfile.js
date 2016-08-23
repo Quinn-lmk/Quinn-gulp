@@ -29,8 +29,8 @@ gulp.task('sass', function(cb) {
         // .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
         .pipe(gulp.dest('./test/css'))
         //css 格式检查
-        .pipe(csslint())
-        .pipe(csslint.formatter());
+        // .pipe(csslint())
+        // .pipe(csslint.formatter());
         cb()
 });
 
@@ -51,22 +51,11 @@ gulp.task('openbrowser',function() {
   opn( 'http://' + config.localserver.host + ':' + config.localserver.port +"/" + config.testHtmlAddress);
 });
 
-
-//一但修改就在配置的网页中刷新
-gulp.task('default',function(){
-    gulp.run('webserver'); //开启服务器
-    gulp.run('openbrowser'); //打开网页
-    //scss文件改变
+//一但修改就在配置的网页中刷新,默认任务
+gulp.task('default',['webserver','openbrowser'],function(){
     gulp.watch(['./test/scss/*.scss'],['sass']);
-    gulp.watch(['./test/js/*.js'],function(){
-        //打开服务器前先检查js,编译css
-        gulp.run('openbrowser',['lint'],function(){
-            console.log('========success========')
-        }); 
-    });
-    //html文件
+    gulp.watch(['./test/js/*.js'],['lint'])
     gulp.watch(['./test/*.html'],function(){
-        //打开服务器前先检查js,编译css
         gulp.run('openbrowser',function(){
             console.log('========success========')
         }); 
@@ -133,3 +122,10 @@ gulp.task('tinypng', function () {
 });
 
 //打包主体build 文件夹并按照时间重命名
+
+
+var scsslint = require('gulp-scss-lint');
+gulp.task('scsslint', function() {
+  return gulp.src('./test/scss/*.scss')
+    .pipe(scsslint());
+});
