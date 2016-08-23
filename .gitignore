@@ -1,0 +1,6 @@
+# file not push to github
+app
+test
+node_modules
+.git
+.gulp
