@@ -1,6 +1,4 @@
-# file not push to github
-app
-test
+# file not push to git
 node_modules
 .git
 .gulp
