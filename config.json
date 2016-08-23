@@ -1,0 +1,16 @@
+{
+    "project" : "quinnlmk",     
+    "localserver" : {
+        "host" : "localhost",
+        "port" : "8081"
+    },
+    "testHtmlAddress":"./test/index.html",
+    "tinypngapi": "vn1j4Dltu99Ux2KSA3yqkHMTjg65tyQU",
+    "sftp" : {
+        "host" : "8.8.8.8",
+        "user" : "username",
+        "port" : "22",
+        "key" : "~/.ssh/sdfsfdsf",
+        "remotePath" :"/"
+    }
+}  
