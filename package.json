@@ -1,26 +1,18 @@
 {
-  "name": "my-project-name",
+  "name": "test",
   "version": "0.1.0",
-  "description": "my description",
-  "author": "Quinne",
+  "description": "my test environment",
+  "author": "Quinn",
   "license": "ISC",
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.0",
-    "gulp-htmlmin": "^2.0.0",
-    "gulp-imagemin": "^2.2.1",
     "gulp-jshint": "^2.0.1",
     "gulp-livereload": "^3.8.0",
-    "gulp-refresh": "^1.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.3.2",
-    "gulp-tinypng": "^1.0.2",
-    "gulp-uglify": "^2.0.0",
-    "gulp-uncss": "^1.0.6",
     "gulp-webserver": "^0.9.0",
     "gulp-zip": "^2.0.3",
     "imagemin-pngquant": "^5.0.0",
-    "jshint": "^2.9.3",
     "opn": "^1.0.1"
   }
 }

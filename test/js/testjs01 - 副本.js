@@ -1,3 +1,3 @@
 function add2 (aaa,bbb) {
-     returfn aaa +bbb; 
+     return aaa +bbb; 
 }
