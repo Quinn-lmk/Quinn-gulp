@@ -125,8 +125,13 @@ gulp.task('tinypng', function () {
 //打包主体build 文件夹并按照时间重命名
 
 
-var scsslint = require('gulp-scss-lint');
-gulp.task('scsslint', function() {
-  return gulp.src('./test/scss/*.scss')
-    .pipe(scsslint());
-});
+//css3加前缀？
+var  autoprefixer = require('gulp-autoprefixer');
+gulp.task('css3', () =>
+    gulp.src('./test/css/test.css')
+        .pipe(autoprefixer({
+            "browsers": ["last 3 version", "> 10%", "> 1% in US", "ie 8", "ie 7","Firefox >= 20"],
+            cascade: false
+        }))
+        .pipe(gulp.dest('dist'))
+);
