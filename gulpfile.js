@@ -57,7 +57,7 @@ gulp.task('default',['webserver','openbrowser'],function(){
     gulp.watch(['./test/js/*.js'],['lint'])
     gulp.watch(['./test/*.html'],function(){
         gulp.run('openbrowser',function(){
-            console.log('========success========')
+            console.log('=======success==master=====')
         }); 
     });
 });
