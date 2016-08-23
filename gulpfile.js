@@ -133,5 +133,5 @@ gulp.task('css3', () =>
             "browsers": ["last 3 version", "> 10%", "> 1% in US", "ie 8", "ie 7","Firefox >= 20"],
             cascade: false
         }))
-        .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest('./test/css/test.css'))
 );
