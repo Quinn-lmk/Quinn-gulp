@@ -2,13 +2,19 @@ var gulp       = require('gulp'),           // 引入 gulp
     config     = require('./config.json'),  //引入本地配置文件
     jshint     = require('gulp-jshint'),    //js检查
     sass       = require('gulp-sass'),      
-    htmlmin    = require('gulp-htmlmin'),   //压缩html
-    rename     = require('gulp-rename'),    //重命名
     webserver  = require('gulp-webserver'), //建立本地服务器
     opn        = require('opn'),            //opn 是打开浏览器的插件
     livereload = require('gulp-livereload');//本地更改刷新服务器
-
-
+    //第二阶段用的插件
+var concat     = require('gulp-concat'),   //合并文件
+    uglify     = require('gulp-uglify'),     //压缩js文件
+    htmlmin    = require('gulp-htmlmin'),   //压缩html
+    rename     = require('gulp-rename'),     //重命名
+    imagemin   = require('gulp-imagemin'),    //压缩图片的第一个插件(1)
+    tinypng    = require('gulp-tinypng'),      //压缩图片2，国外的，更好用
+    zip        = require('gulp-zip'),       //给app打包，一般使用git
+    csslint    = require('gulp-csslint'),    //检查css是否有错
+    uncss      = require('gulp-uncss');        //为bootstrap提出用到的css
 // 检查 js，有没有报错或警告。
 gulp.task('lint', function(cb) {
     gulp.src('./test/js/*.js')
@@ -16,15 +22,19 @@ gulp.task('lint', function(cb) {
         .pipe(jshint.reporter('default'));
     cb();
 });
-// 编译Sass。
-gulp.task('sass', function() {
+// 编译Sass。并检查css
+gulp.task('sass', function(cb) {
     gulp.src('./test/scss/*.scss')
         .pipe(sass().on('error', sass.logError))
         // .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-        .pipe(gulp.dest('./test/css'));
+        .pipe(gulp.dest('./test/css'))
+        //css 格式检查
+        .pipe(csslint())
+        .pipe(csslint.formatter());
+        cb()
 });
 
-//开启本地 Web,livereload 可以自动刷新浏览器(chrome 下载)
+//开启本地 Web,livereload 可以自动刷新浏览器(chrome)
 gulp.task('webserver', function(cb) {
   gulp.src( './' )
     .pipe(webserver({
@@ -35,17 +45,29 @@ gulp.task('webserver', function(cb) {
     }));
     cb();
 });
-//通过浏览器打开，地址在config配置
+
+//单独放在task中会重新打开网页，放在另外挂task中可以刷新
 gulp.task('openbrowser',function() {
   opn( 'http://' + config.localserver.host + ':' + config.localserver.port +"/" + config.testHtmlAddress);
 });
 
+
 //一但修改就在配置的网页中刷新
 gulp.task('default',function(){
     gulp.run('webserver'); //开启服务器
-    gulp.watch(['./test/scss/*.scss','./test/*.html','./test/js/*.js'],function(){
+    gulp.run('openbrowser'); //打开网页
+    //scss文件改变
+    gulp.watch(['./test/scss/*.scss'],['sass']);
+    gulp.watch(['./test/js/*.js'],function(){
         //打开服务器前先检查js,编译css
-        gulp.run('openbrowser',['lint','sass'],function(){
+        gulp.run('openbrowser',['lint'],function(){
+            console.log('========success========')
+        }); 
+    });
+    //html文件
+    gulp.watch(['./test/*.html'],function(){
+        //打开服务器前先检查js,编译css
+        gulp.run('openbrowser',function(){
             console.log('========success========')
         }); 
     });
@@ -54,3 +76,60 @@ gulp.task('default',function(){
 
 
 
+//将bootstrap中用到的css提取出来
+gulp.task('uncss', function () {
+    return gulp.src('./test/bootstrap/bootstrap.css')
+        .pipe(uncss({
+            html: ['./test/index.html']
+            // html: ['index.html', 'posts/**/*.html', 'http://example.com']
+        }))
+        .pipe(gulp.dest('./test/bootstrap/use'));
+});
+
+//直接复制过去，压缩打包正式上线时修改即可
+gulp.task('zip', function(){
+      function checkTime(i) {
+          if (i < 10) {
+              i = "0" + i
+          }
+          return i
+      }
+      var d=new Date();
+      var year=d.getFullYear();
+      var month=checkTime(d.getMonth() + 1);
+      var day=checkTime(d.getDate());
+      var hour=checkTime(d.getHours());
+      var minute=checkTime(d.getMinutes());
+  return gulp.src('./test/**')
+        .pipe(zip( config.project+'-'+year+month+day +hour+minute+'.zip'))
+        .pipe(gulp.dest('./app'));
+});
+
+//压缩与 jasmine 之类，在测试环境中不考虑
+//压缩html
+gulp.task('minihtml', function() {
+   gulp.src('./test/**/*.html')
+    .pipe(htmlmin({collapseWhitespace: true}))
+    .pipe(gulp.dest('./app/'))
+});
+// 压缩 JS 
+gulp.task('js', function() {
+    gulp.src('./test/**/*.js')
+        .pipe(uglify())
+        .pipe(gulp.dest('./app'));
+});
+//压缩图片 -imagemin
+gulp.task('imagemin', function () {
+    return gulp.src('./test/images/*')
+        .pipe(imagemin())
+        .pipe(gulp.dest('./app/images'));
+});
+
+//压缩图片 - tinypng(更小，更强)
+gulp.task('tinypng', function () {
+    gulp.src('./test/images/*.{png,jpg,jpeg}')
+        .pipe(tinypng(config.tinypngapi))
+        .pipe(gulp.dest('./app/images'));
+});
+
+//打包主体build 文件夹并按照时间重命名
